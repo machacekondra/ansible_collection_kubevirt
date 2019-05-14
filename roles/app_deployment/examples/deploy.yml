@@ -5,7 +5,16 @@
     kubevirt_app_vms:
       - name: mydb
         namespace: myapp
-        template: postgresql
+        image:
+          url: http://server/image.qcow2
+          storage: 5Gi
+          storage_class: default
+        labels:
+          app: myapp
+
+      - name: mypostgres
+        namespace: myapp
+        template: postgres
         labels:
           app: myapp
     
