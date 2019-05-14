@@ -1,0 +1,30 @@
+- name: Create virtual machines
+  kubevirt_vm:
+    state: "{{ item.state | default('present') }}"
+    wait: "{{ item.wait | default(true) }}"
+    name: "{{ item.name | mandatory }}"
+    namespace: "{{ item.namespace | default('default') }}"
+    memory: "{{ item.memory }}"
+    disks:
+      - name: default-disk
+        volume:
+          containerDisk:
+            image: kubevirt/cirros-container-disk-demo:latest
+        disk:
+          bus: virtio
+    interfaces:
+      - name: default-nic
+        bridge: {}
+        network:
+          pod: {}
+  with_items: "{{ kubevirt_app_vms }}"
+
+- name: Create deployments
+    state: "{{ item.state }}"
+    definition: "{{ {{ lookup('template', 'templates/deployment.j2') }} }}"
+  with_items: "{{ kubevirt_app_deployments }}"
+
+- name: Create services
+    state: "{{ item.state }}"
+    definition: "{{ {{ lookup('template', 'templates/service.j2') }} }}"
+  with_items: "{{ kubevirt_app_services }}"

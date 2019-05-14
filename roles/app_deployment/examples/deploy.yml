@@ -1,0 +1,28 @@
+- name: Deploy application
+  hosts: localhost
+
+  vars:
+    kubevirt_app_vms:
+      - name: mydb
+        namespace: myapp
+        template: postgresql
+        labels:
+          app: myapp
+    
+    kubevirt_app_services:
+      - name: myapp-service
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 9376
+
+    kubevirt_app_deployments:
+      - name: myapp
+        replicas: 2
+        namespace: myapp
+        image: nginx
+        labels:
+          app: myapp
+
+  roles:
+    - kubevirt.app_deployment
