@@ -1,22 +1,22 @@
+#jinja2: lstrip_blocks: True
 kind: Deployment
-name: "{{ item.name }}"
-api_version: "{{ item.api_version }}"
-{% if item.labels is defined or item.annotations is defined %}
+apiVersion: "{{ item.api_version | default('apps/v1') }}"
 metadata:
+  name: "{{ item.name }}"
+  namespace: "{{ item.namespace }}"
   {% if item.labels is defined %}
-  labels: "{{ item.labels }}"
+  labels: {{ item.labels | to_yaml }}
   {% endif %}
   {% if item.annotations is defined %}
   annotations: "{{ item.annotations }}"
   {% endif %}
-{% endif %}
 spec:
   {% if item.replicas is defined %}
-  replicas: "{{ item.replicas }}"
+  replicas: "{{ item.replicas | int }}"
   {% endif %}
   {% if item.labels is defined %}
   selector:
-    matchLabels: "{{ item.labels }}"
+    matchLabels: {{ item.labels | to_yaml }}
   {% endif %}
   {% if item.max_surge is defined or item.max_unavailable is defined %}
   strategy:
@@ -28,7 +28,7 @@ spec:
   template:
     {% if item.labels is defined %}
     metadata:
-      labels: "{{ item.labels }}"
+      labels: {{ item.labels | to_yaml }}
     {% endif %}
     {% if item.containers is defined %}
     spec:
